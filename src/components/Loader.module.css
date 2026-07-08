@@ -1,0 +1,16 @@
+.loader {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loaderImage {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.compact .loaderImage {
+  width: 22px;
+  height: 22px;
+}

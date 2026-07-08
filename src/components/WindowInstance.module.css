@@ -9,7 +9,41 @@
   flex-direction: column;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.8);
-  transition: box-shadow 0.2s ease;
+  transition: left 0.18s ease, top 0.18s ease, width 0.18s ease, height 0.18s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease, transform 0.18s ease, opacity 0.18s ease;
+  will-change: left, top, width, height, transform, opacity;
+  transform-origin: center top;
+}
+
+.appearing {
+  animation: windowEnter 0.34s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.moving {
+  transition: box-shadow 0.12s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.light {
+  background: rgba(250, 250, 250, 0.95);
+  color: #111;
+}
+
+.dark {
+  background: rgba(20, 20, 20, 0.92);
+  color: #f5f5f7;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.dark .titleBar {
+  background: linear-gradient(to bottom, #333337, #1b1b1f);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dark .title {
+  color: #f5f5f7;
+}
+
+.dark .content {
+  background: #141416;
 }
 
 .focused {
@@ -35,19 +69,20 @@
 
 .controls {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   position: absolute;
   left: 16px;
 }
 
 .closeBtn, .minBtn, .maxBtn {
-  width: 12px;
-  height: 12px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 4px;
 }
 
 .closeBtn {
@@ -78,14 +113,10 @@
 
 .content {
   flex: 1;
-  padding: 24px;
-  font-size: 15px;
-  color: #333;
   background: #ffffff;
-  overflow-y: auto;
+  overflow: hidden; /* Apps will handle their own scrolling now */
   display: flex;
   flex-direction: column;
-  gap: 12px;
 }
 
 .content h2 {
@@ -96,4 +127,94 @@
 .content p {
   line-height: 1.5;
   color: #555;
+}
+
+.resizeZone {
+  position: absolute;
+  z-index: 5;
+}
+
+.top,
+.bottom {
+  left: 14px;
+  right: 14px;
+  height: 14px;
+}
+
+.left,
+.right {
+  top: 14px;
+  bottom: 14px;
+  width: 14px;
+}
+
+.top {
+  top: -7px;
+  cursor: n-resize;
+}
+
+.right {
+  right: -7px;
+  cursor: e-resize;
+}
+
+.bottom {
+  bottom: -7px;
+  cursor: s-resize;
+}
+
+.left {
+  left: -7px;
+  cursor: w-resize;
+}
+
+.topLeft,
+.topRight,
+.bottomLeft,
+.bottomRight {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  z-index: 6;
+}
+
+.topLeft {
+  top: -7px;
+  left: -7px;
+  cursor: nwse-resize;
+}
+
+.topRight {
+  top: -7px;
+  right: -7px;
+  cursor: nesw-resize;
+}
+
+.bottomLeft {
+  bottom: -7px;
+  left: -7px;
+  cursor: nesw-resize;
+}
+
+.bottomRight {
+  right: -7px;
+  bottom: -7px;
+  cursor: nwse-resize;
+}
+
+@keyframes windowEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0) scale(0.958);
+  }
+
+  68% {
+    opacity: 1;
+    transform: translate3d(0, -1px, 0) scale(1.003);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
 }

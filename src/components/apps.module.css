@@ -1,0 +1,935 @@
+/* --- SHARED LAYOUTS --- */
+.appContainer {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  background: #ffffff;
+}
+
+.sidebar {
+  width: 200px;
+  background: rgba(235, 235, 235, 0.8);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid #d9d9d9;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mainArea {
+  flex: 1;
+  overflow-y: auto;
+  background: #ffffff;
+  padding: 20px;
+  container-type: inline-size;
+}
+
+.themeSectionText {
+  color: #666;
+  margin-bottom: 18px;
+}
+
+.settingsPanel {
+  margin-top: 18px;
+}
+
+.accountShell {
+  margin-top: 18px;
+}
+
+.accountColumns {
+  display: grid;
+  grid-template-columns: 248px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.accountSidebarPanel,
+.accountDetailPanel {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid #d8d8dd;
+  border-radius: 18px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.05);
+}
+
+.accountSidebarPanel {
+  padding: 14px;
+}
+
+.accountDetailPanel {
+  padding: 22px 22px 18px;
+}
+
+.accountListHeader {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #8b8b92;
+  margin: 2px 2px 8px;
+}
+
+.accountListCard {
+  background: rgba(246, 246, 248, 0.96);
+  border: 1px solid #e5e5ea;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.accountListItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+}
+
+.accountListItemSelected {
+  background: linear-gradient(180deg, #4a9aff 0%, #0a84ff 100%);
+  color: #fff;
+}
+
+.accountMiniAvatar,
+.accountGroupIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.accountMiniAvatar {
+  background: linear-gradient(180deg, #fbe4bc 0%, #c99664 100%);
+  color: rgba(57, 35, 11, 0.88);
+}
+
+.accountGroupIcon {
+  background: #d9dbe3;
+}
+
+.accountMiniMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.accountMiniMeta strong {
+  font-size: 13px;
+}
+
+.accountMiniMeta span {
+  font-size: 11px;
+  opacity: 0.78;
+}
+
+.accountMiniBadge {
+  margin-left: auto;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.accountAddButton {
+  width: 100%;
+  border: 1px solid #d1d1d6;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f4f6 100%);
+  color: #808089;
+  font: inherit;
+  font-size: 12px;
+}
+
+.accountHeader {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid #e6e6eb;
+}
+
+.accountLargeAvatarShell {
+  width: 82px;
+  height: 82px;
+  padding: 3px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #ffffff 0%, #ececf2 100%);
+  border: 1px solid #d8d8de;
+  flex-shrink: 0;
+}
+
+.accountLargeAvatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, #fbe4bc 0%, #c99664 100%);
+  color: rgba(57, 35, 11, 0.88);
+  font-size: 1.55rem;
+  font-weight: 700;
+}
+
+.accountHeaderCopy h3 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.accountRole {
+  margin: 4px 0 6px;
+  font-size: 13px;
+  color: #6d6d74;
+}
+
+.accountSecondaryMeta {
+  margin: 0;
+  font-size: 12px;
+  color: #8a8a92;
+  line-height: 1.45;
+  max-width: 460px;
+}
+
+.accountFormGrid {
+  display: grid;
+  gap: 0;
+}
+
+.accountRow {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #ececf0;
+}
+
+.accountRow:last-child {
+  border-bottom: none;
+}
+
+.accountRowLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6d6d74;
+}
+
+.accountRowControl {
+  min-width: 0;
+}
+
+.accountFieldValue {
+  font-size: 13px;
+  color: #26262b;
+}
+
+.accountSaveRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+@container (max-width: 760px) {
+  .accountColumns {
+    grid-template-columns: 1fr;
+  }
+
+  .accountSidebarPanel,
+  .accountDetailPanel {
+    width: 100%;
+  }
+
+  .accountDetailPanel {
+    padding: 18px;
+  }
+
+  .accountHeader {
+    align-items: flex-start;
+  }
+
+  .accountFormGrid {
+    gap: 10px;
+  }
+
+  .accountRow {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 10px 0;
+  }
+
+  .accountRowLabel {
+    font-size: 12px;
+  }
+}
+
+.settingsCard {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid #d1d1d6;
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.05);
+}
+
+.settingsCard h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.settingsCardText {
+  color: #666;
+  margin-bottom: 18px;
+}
+
+.settingsFieldLabel {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin: 12px 0 8px;
+}
+
+.settingsInput {
+  width: 100%;
+  border: 1px solid #d1d1d6;
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: #fff;
+  color: #111;
+  font: inherit;
+}
+
+.settingsInput:focus {
+  outline: none;
+  border-color: #007aff;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.14);
+}
+
+.settingsActionsRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+.primarySettingsButton {
+  border: 1px solid #007aff;
+  border-radius: 12px;
+  padding: 10px 16px;
+  background: #007aff;
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primarySettingsButton:hover {
+  background: #0067da;
+}
+
+.settingsStatusText {
+  font-size: 13px;
+  color: #666;
+}
+
+.preferenceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 14px 0;
+  border-top: 1px solid #ececf0;
+}
+
+.preferenceRow:first-of-type {
+  border-top: none;
+}
+
+.preferenceHint {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #7a7a82;
+}
+
+.preferenceToggle {
+  width: 48px;
+  height: 28px;
+  border: none;
+  border-radius: 999px;
+  background: #d1d1d6;
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+
+.preferenceToggleActive {
+  background: #34c759;
+}
+
+.preferenceKnob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.24);
+  transition: transform 0.2s ease;
+}
+
+.preferenceToggleActive .preferenceKnob {
+  transform: translateX(20px);
+}
+
+.themeToggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.themeToggleButton {
+  flex: 1;
+  border: 1px solid #d1d1d6;
+  border-radius: 14px;
+  padding: 12px 16px;
+  background: #f7f7f7;
+  color: #111;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.themeToggleButton:hover {
+  background: #ececec;
+}
+
+.themeToggleButton.active {
+  background: #007aff;
+  color: #fff;
+  border-color: #007aff;
+}
+
+.wallpaperGrid {
+  display: grid;
+  gap: 12px;
+}
+
+.wallpaperOption {
+  border: 1px solid #d1d1d6;
+  border-radius: 16px;
+  padding: 14px;
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+.activeWallpaper {
+  border-color: #007aff;
+  box-shadow: 0 8px 20px rgba(0,122,255,0.15);
+}
+
+.wallpaperHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.wallpaperType {
+  color: #666;
+  font-size: 13px;
+}
+
+.selectedLabel {
+  color: #007aff;
+  font-size: 12px;
+}
+
+.wallpaperVariants {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.variantButton {
+  flex: 1 1 120px;
+  min-width: 120px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: left;
+  cursor: pointer;
+  background: #f7f7f7;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.variantButton:hover {
+  background: #f0f0f0;
+}
+
+.activeVariantButton {
+  border-color: #007aff;
+  background: rgba(0, 122, 255, 0.12);
+}
+
+.variantPreview {
+  width: 100%;
+  height: 70px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.thumbnailLoader,
+.finderIconLoader {
+  position: absolute;
+}
+
+.sidebarItem {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebarItem:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.sidebarItem.active {
+  background: #007aff;
+  color: white;
+}
+
+/* --- FINDER SPECIFIC --- */
+.appGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.appIconWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  width: 80px;
+}
+
+.appIconWrapper .icon {
+  font-size: 30px;
+  width: 52px;
+  height: 52px;
+  background: #f0f0f0;
+  padding: 10px;
+  border-radius: 14px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.appIconWrapper span {
+  font-size: 12px;
+  text-align: center;
+}
+
+/* --- SHARED DARK MODE --- */
+.safariApp {
+  width: 100%;
+  height: 100%;
+}
+
+.darkApp {
+  background: rgba(20, 20, 20, 0.96);
+  color: #e5e5ea;
+}
+
+.darkApp .sidebar {
+  background: rgba(24, 24, 24, 0.92);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #e5e5ea;
+}
+
+.darkApp .mainArea {
+  background: rgba(16, 16, 16, 0.82);
+  color: #e5e5ea;
+}
+
+.darkApp .sidebarItem {
+  color: #e5e5ea;
+}
+
+.darkApp .sidebarItem:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.darkApp .sidebarItem.active {
+  background: #007aff;
+  color: white;
+}
+
+.darkApp h2,
+.darkApp p {
+  color: #e5e5ea;
+}
+
+.darkApp .themeSectionText {
+  color: #c2c2c8;
+}
+
+.darkApp .settingsCard {
+  background: rgba(26, 26, 28, 0.94);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+}
+
+.darkApp .accountSidebarPanel,
+.darkApp .accountDetailPanel,
+.darkApp .accountListCard {
+  background: rgba(26, 26, 28, 0.94);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+}
+
+.darkApp .accountHeader {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.darkApp .accountRow {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+.darkApp .accountListHeader,
+.darkApp .accountRole,
+.darkApp .accountSecondaryMeta,
+.darkApp .accountRowLabel {
+  color: #a9a9b2;
+}
+
+.darkApp .accountFieldValue {
+  color: #f2f2f7;
+}
+
+.darkApp .accountGroupIcon {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.darkApp .accountAddButton {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #7f7f88;
+}
+
+.darkApp .settingsCardText,
+.darkApp .settingsStatusText,
+.darkApp .preferenceHint {
+  color: #c2c2c8;
+}
+
+.darkApp .preferenceRow {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+.darkApp .preferenceToggle {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.darkApp .preferenceToggleActive {
+  background: #30d158;
+}
+
+.darkApp .settingsInput {
+  background: rgba(255, 255, 255, 0.06);
+  color: #f2f2f7;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.darkApp .settingsInput:focus {
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.22);
+}
+
+.darkApp .themeToggleButton {
+  background: rgba(255, 255, 255, 0.06);
+  color: #f2f2f7;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.darkApp .themeToggleButton:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.darkApp .variantButton {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.darkApp .variantButton:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.darkApp .activeVariantButton {
+  background: rgba(0, 122, 255, 0.18);
+}
+
+.darkApp .wallpaperOption {
+  background: rgba(18, 18, 18, 0.9);
+  box-shadow: none;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.darkApp .wallpaperType {
+  color: #b8b8bc;
+}
+
+.darkApp .urlBar {
+  background: rgba(18, 18, 18, 0.9);
+  color: #e5e5ea;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.darkApp .safariToolbar {
+  background: rgba(18, 18, 18, 0.9);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.darkApp .iframe {
+  background: #0c0c0f;
+}
+
+.iframeShell {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.iframeLoaderOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.42);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 1;
+}
+
+.darkApp .iframeLoaderOverlay {
+  background: rgba(12, 12, 15, 0.5);
+}
+
+.darkCalc {
+  background: #111;
+}
+
+.darkCalc .calcDisplay {
+  color: #f5f5f7;
+}
+
+.darkCalc .calcBtn {
+  background: #262626;
+  color: #f5f5f7;
+}
+
+.darkCalc .calcBtn.top {
+  background: #383838;
+  color: #fff;
+}
+
+.darkCalc .calcBtn.op {
+  background: #ff9f0a;
+  color: #fff;
+}
+
+.terminalDark {
+  background: #0d0d0f;
+  color: #e8e8ee;
+}
+
+.terminalDark .termTabs {
+  background: #1e1e22;
+}
+
+.terminalDark .termTab {
+  background: #2f2f33;
+  color: #f5f5f7;
+}
+
+.terminalDark .termBody {
+  color: #e5e5e9;
+}
+
+/* --- SAFARI SPECIFIC --- */
+.safariToolbar {
+  height: 40px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #d9d9d9;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+}
+
+.urlBar {
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 13px;
+  text-align: center;
+  color: #333;
+}
+
+.iframe {
+  width: 100%;
+  height: calc(100% - 40px);
+  border: none;
+}
+
+/* --- TERMINAL SPECIFIC --- */
+.terminalContainer {
+  background: #0c0c0c;
+  color: #cccccc;
+  font-family: "Consolas", "Courier New", monospace;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.termTabs {
+  background: #1c1c1c;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+}
+
+.termTab {
+  background: #2d2d2d;
+  color: white;
+  font-size: 12px;
+  padding: 6px 16px;
+  border-radius: 6px 6px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.termTab:hover .tabClose {
+  opacity: 1;
+  visibility: visible;
+}
+
+.tabClose {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 12px;
+  opacity: 0;
+  visibility: hidden;
+  cursor: pointer;
+}
+
+.termBody {
+  padding: 12px;
+  font-size: 14px;
+}
+
+/* --- CALCULATOR SPECIFIC --- */
+.calcContainer {
+  background: #242424;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  color: white;
+}
+
+.calcDisplay {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 300;
+  padding-bottom: 16px;
+  min-height: 88px;
+}
+
+.calcGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(64px, 1fr));
+  gap: 10px;
+}
+
+.calcBtn {
+  min-height: 64px;
+  border-radius: 24px;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  background: #333333;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calcBtn.top { background: #a5a5a5; color: black; }
+.calcBtn.op { background: #ff9f0a; color: white; }
+.calcBtn.zero { grid-column: span 2; border-radius: 40px; justify-content: flex-start; padding-left: 24px; min-height: 64px; aspect-ratio: auto; }
+
+/* --- SETTINGS SPECIFIC --- */
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #d9d9d9;
+  margin-bottom: 12px;
+}
+.profilePic {
+  width: 40px; height: 40px;
+  background: #ccc; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 20px;
+}
+.profileInfo h4 { margin: 0; font-size: 14px; }
+.profileInfo p { margin: 0; font-size: 11px; color: #666; }

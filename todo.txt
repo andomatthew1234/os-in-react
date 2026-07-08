@@ -1,0 +1,12 @@
+- Spotlight
+- Trash app
+- Control centre
+- Launchpad
+
+Test:
+Implement:
+- App folders or grouping in Launchpad.
+- Launchpad
+- Spotlight search- this should be intergrated into ALL OF YOUR COGNITO WRITE NOTES, APPS IN LAUNCHPAD, settings, and more
+- Control Centre - this should look EXACTLY like the macOS control centre, with all of the features (just none except for some of them that we've already added work). 
+- Lock screen return action - press the lock symbol in the control centre to activate

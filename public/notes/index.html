@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cognito Write</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://unpkg.com/html-docx-js/dist/html-docx.js"></script>
+  <style>
+    :root {
+      --bg: #fff; --fg: #222; --ribbon: #f0f0f0; --panel: #fff; --btn-bg: #fff;
+      --btn-fg: #222; --sidebar: #f8f8f8; --border: #e0e0e0; --selected: #0078d4;
+      --hover: #f0f0f0; --shadow: rgba(0,0,0,0.1); --sticky-yellow: #fff9c4; --glow: transparent;
+    }
+    [data-theme="dark"] {
+      --bg: #1e1e1e; --fg: #f4f4f4; --ribbon: #2d2d2d; --panel: #252526;
+      --btn-bg: #333; --btn-fg: #f4f4f4; --sidebar: #252526; --border: #444;
+      --selected: #0a84ff; --hover: #3a3d41; --shadow: rgba(0,0,0,0.3);
+      --sticky-yellow: #4d4d38;
+    }
+    [data-theme="darkblue"] {
+      --bg: #0b253a; --fg: #e0f7fa; --ribbon: #103d5d; --panel: #0f314a;
+      --btn-bg: #1976d2; --btn-fg: #e0f7fa; --sidebar: #103d5d; --border: #1976d2;
+      --selected: #4fc3f7; --hover: #1565c0;
+    }
+    [data-theme="ocean"] {
+        --bg: #e0f7fa; --fg: #004d40; --ribbon: #b2ebf2; --panel: #e0f7fa;
+        --btn-bg: #80deea; --btn-fg: #004d40; --sidebar: #b2ebf2; --border: #4dd0e1;
+        --selected: #00796b; --hover: #80deea;
+    }
+    [data-theme="neon"] {
+      --bg: #0a0a0a; --fg: #00ff00; --ribbon: #111; --panel: #050505;
+      --btn-bg: #222; --btn-fg: #00ff00; --sidebar: #111; --border: #00ff00;
+      --selected: #00ff00; --hover: #333;
+    }
+    [data-theme="flashy"] {
+      --bg: #ffcdd2; --fg: #b71c1c; --ribbon: #ef9a9a; --panel: #ffcdd2;
+      --btn-bg: #ff8a80; --btn-fg: #b71c1c; --sidebar: #ef9a9a; --border: #e57373;
+      --selected: #d32f2f; --hover: #ff8a80;
+    }
+    [data-theme="solar"] {
+        --bg: #fdf6e3; --fg: #657b83; --ribbon: #f5eccc; --panel: #fdf6e3;
+        --btn-bg: #eee8d5; --btn-fg: #657b83; --sidebar: #f5eccc; --border: #eee8d5;
+        --selected: #d33682; --hover: #eee8d5;
+    }
+    [data-theme="crimsonred"], [data-theme="crimsonblue"], [data-theme="crimsonyellow"] {
+      --bg: #121212; --fg: #e0e0e0; --ribbon: #1e1e1e; --panel: #1a1a1a;
+      --btn-bg: #2a2a2a; --btn-fg: #e0e0e0; --sidebar: #1e1e1e; --border: #333;
+      --hover: #4e1e1c;
+    }
+    [data-theme="crimsonred"] { --selected: #e53935; --glow: #e53935; }
+    [data-theme="crimsonblue"] { --selected: #1e88e5; --glow: #1e88e5; }
+    [data-theme="crimsonyellow"] { --selected: #fdd835; --glow: #fdd835; }
+
+    [data-theme^="crimson"] .top-bar-btn:hover, [data-theme^="crimson"] .ribbon-btn:hover,
+    [data-theme^="crimson"] .mode-btn:hover {
+        box-shadow: 0 0 5px var(--glow); border-color: var(--glow);
+    }
+    [data-theme^="crimson"] .list-item.active { box-shadow: 0 0 8px var(--glow); }
+    [data-theme^="crimson"] .sidebar, [data-theme^="crimson"] #top-bar { box-shadow: 0 0 10px -4px var(--glow); }
+
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0; padding: 0; background-color: var(--bg); color: var(--fg);
+      display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+    }
+    .app-view { display: none; flex-direction: column; height: 100%; }
+    
+    #main-homepage { text-align: center; justify-content: center; align-items: center; position: relative; }
+    #main-homepage h1 { font-size: 3rem; margin-bottom: 1rem; }
+    #search-bar-home { width: 100%; max-width: 500px; padding: 12px; font-size: 1.2rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 2rem; background-color: var(--panel); color: var(--fg);}
+    #mode-selection { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; max-width: 700px; }
+    .mode-btn {
+        background-color: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+        padding: 2rem; cursor: pointer; text-align: center;
+        box-shadow: 0 4px 10px var(--shadow); transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .mode-btn:hover { transform: translateY(-5px); box-shadow: 0 6px 15px var(--shadow); }
+    .mode-btn span { font-size: 3rem; display: block; margin-bottom: 1rem; }
+    .mode-btn h2 { margin: 0; font-size: 1.2rem; }
+    #settings-btn-home { position: absolute; top: 20px; right: 20px; font-size: 1.5rem; padding: 8px; }
+
+    #top-bar {
+      background: var(--ribbon); border-bottom: 1px solid var(--border);
+      padding: 8px 16px; display: flex; align-items: center; gap: 16px; flex-shrink: 0;
+    }
+    .top-bar-btn { font-size: 14px; font-weight: 600; background: none; border: none; color: var(--fg); cursor: pointer; padding: 4px 8px; border-radius: 5px; }
+    .top-bar-btn:hover { background-color: var(--hover); }
+    .ribbon-btn {
+      background: var(--btn-bg); color: var(--fg); border: 1px solid var(--border);
+      border-radius: 5px; padding: 6px 12px; font-size: 14px; cursor: pointer;
+    }
+    .ribbon-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    #container { display: flex; flex: 1; overflow: hidden; }
+    .sidebar { width: 260px; background: var(--sidebar); padding: 16px; border-right: 1px solid var(--border); display: flex; flex-direction: column; gap: 12px; }
+    .main-content { flex: 1; display: flex; flex-direction: column; background-color: var(--panel); }
+    .item-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; flex-grow: 1; }
+    .list-item { padding: 10px 12px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 500; }
+    .list-item:hover { background-color: var(--hover); }
+    .list-item.active { background-color: var(--selected); color: white; }
+    
+    #doc-ribbon-container { background: var(--ribbon); border-bottom: 1px solid var(--border); }
+    #doc-ribbon-tabs { display: flex; padding: 0 8px; }
+    #doc-ribbon-tabs .ribbon-btn { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom-color: transparent; }
+    #doc-ribbon-tabs .ribbon-btn.active { border-bottom-color: var(--panel); background-color: var(--panel); }
+    #doc-ribbon-panels { min-height: 50px; padding: 8px 16px; display: flex; align-items: center; }
+    .doc-ribbon-panel { display: none; gap: 16px; align-items: center; } .doc-ribbon-panel.active { display: flex; }
+    #document-editor { width: 100%; height: 100%; padding: 20px; font-size: 16px; border: none; outline: none; background: var(--panel); color: var(--fg); }
+    #doc-template-view { display: none; flex-direction:column; justify-content:center; align-items:center; padding: 40px; text-align: center; height:100%; }
+    #doc-template-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; max-width: 1000px; margin: 20px auto; }
+    .template-card { padding: 20px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; }
+    .template-card:hover { border-color: var(--selected); box-shadow: 0 2px 8px var(--shadow); }
+    
+    .page-view { display: none; width: 100%; height: 100%; flex-direction: column; }
+    .page-view.active { display: flex; }
+    #main_note-view, #quick_note-view, #notes-app-editor {
+        padding: 24px 32px; font-size: 16px; line-height: 1.6;
+        border: none; outline: none; background: inherit; color: var(--fg); resize: none;
+        width: 100%; height: 100%;
+    }
+    #sticky_note-view { position: relative; overflow: auto; padding: 24px; background-color: var(--panel); }
+    .sticky-note { position: absolute; width: 200px; height: 200px; background-color: var(--sticky-yellow); padding: 10px; border-radius: 4px; box-shadow: 0 4px 8px var(--shadow); cursor: move; display: flex; }
+    .sticky-note textarea { width: 100%; height: 100%; background: transparent; border: none; resize: none; outline: none; font-family: inherit; font-size: 15px; color: var(--fg); }
+    
+    #character-view, #timeline-view { flex-direction: row; }
+    #character-view .sidebar, #timeline-view .sidebar { width: 300px; }
+    #character-view .main-content, #timeline-view .main-content { overflow-y: auto; padding: 20px; }
+    .timeline-event { background: var(--sidebar); padding: 15px; border-radius: 6px; margin-bottom: 10px; cursor: grab; }
+    .timeline-event:active { cursor: grabbing; }
+
+    #project-view { text-align:center; }
+    #project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px; width: 100%; max-width: 1200px; margin: 40px auto; }
+    .project-card {
+        background-color: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+        padding: 20px; text-align: center; cursor: pointer; box-shadow: 0 2px 5px var(--shadow);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .project-card:hover { transform: translateY(-5px); box-shadow: 0 4px 10px var(--shadow); }
+    .project-card h3 { margin: 0 0 10px 0; }
+    .project-card-new { border-style: dashed; }
+    
+    #settings-view-content { padding: 40px; }
+    .setting-group { margin-bottom: 24px; max-width: 400px; }
+    .setting-group label { font-weight: bold; display: block; margin-bottom: 8px; }
+    #custom-theme-grid { display: grid; grid-template-columns: auto 1fr; gap: 10px 20px; align-items: center; }
+    #trash-list { list-style: none; padding: 0; }
+    .trash-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid var(--border); }
+    
+    .modal { display: none; position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+    .modal-content { background-color: var(--panel); border-radius: 8px; padding: 24px; border: 1px solid var(--border); width: 90%; max-width: 450px; text-align: center; }
+    .modal-content h2 { margin-top: 0; }
+    .modal-view { display: none; } .modal-view.active { display: block; }
+    .page-creation-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+    .page-creation-grid button { background-color: var(--hover); border: 1px solid var(--border); color: var(--fg); padding: 20px; text-align: center; border-radius: 6px; cursor: pointer; font-size: 16px; line-height: 1.4; }
+    .page-creation-grid button:hover { border-color: var(--selected); }
+    .page-creation-grid span { display: block; font-size: 24px; margin-bottom: 8px; }
+    #page-title-entry, #challenge-entry, #input-modal-entry { display: none; }
+    #page-title-entry.active, #challenge-entry.active, #input-modal-entry.active { display: grid; }
+    #page-title-entry, #challenge-entry, #input-modal-entry { grid-template-columns: 1fr; gap: 12px; margin: 20px 0; }
+    #challenges-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+    .challenge-card { background: var(--panel); border: 1px solid var(--border); padding: 16px; border-radius: 8px; }
+    .challenge-card h4 { margin: 0 0 10px 0; }
+    progress { width: 100%; }
+    
+    #community-view-content {
+        padding: 40px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        align-content: start;
+        overflow-y: auto;
+        height: 100%;
+    }
+    .link-card {
+        background-color: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 20px;
+        text-align: left;
+        box-shadow: 0 2px 5px var(--shadow);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .link-card:hover { transform: translateY(-3px); box-shadow: 0 4px 8px var(--shadow); }
+    .link-card h3 { margin-top: 0; font-size: 1.2rem; }
+    .link-card p { margin-bottom: 15px; opacity: 0.8; }
+
+  </style>
+</head>
+<body>
+
+<div id="main-homepage" class="app-view active">
+    <button id="settings-btn-home" class="top-bar-btn">⚙️</button>
+    <h1>Cognito Write</h1>
+    <input type="text" id="search-bar-home" placeholder="Search everywhere...">
+    <div id="mode-selection">
+        <div id="select-docs-mode" class="mode-btn"><span>📄</span><h2>Documents</h2></div>
+        <div id="select-notes-mode" class="mode-btn"><span>📝</span><h2>Notes</h2></div>
+    </div>
+</div>
+<div id="docs-app-view" class="app-view">
+    <div id="top-bar"> <button class="top-bar-btn" id="home-btn-from-docs">⬅️ Home</button> <h2 style="margin: 0;">Documents</h2> </div>
+    <div id="doc-ribbon-container">
+        <div id="doc-ribbon-tabs">
+            <button class="ribbon-btn active" data-tab="file">File</button>
+            <button class="ribbon-btn" data-tab="format">Format</button>
+            <button class="ribbon-btn" data-tab="insert">Insert</button>
+        </div>
+        <div id="doc-ribbon-panels">
+            <div class="doc-ribbon-panel active" data-tab-panel="file">
+                <button class="ribbon-btn" id="doc-change-icon-btn">Change Icon</button>
+                <button class="ribbon-btn" id="doc-export-btn">Export</button>
+                <button class="ribbon-btn" id="doc-undo-btn">Undo</button>
+                <button class="ribbon-btn" id="doc-redo-btn">Redo</button>
+                <button class="ribbon-btn" id="doc-delete-btn">Delete</button>
+            </div>
+            <div class="doc-ribbon-panel" data-tab-panel="format">
+                <select id="doc-font-select" class="ribbon-btn"></select>
+                <input type="number" id="doc-font-size" class="ribbon-btn" style="width: 70px;">
+            </div>
+             <div class="doc-ribbon-panel" data-tab-panel="insert">
+                <button class="ribbon-btn" id="doc-insert-image-btn">Insert Image</button>
+                <button class="ribbon-btn" id="doc-insert-file-btn">Insert File Link</button>
+            </div>
+        </div>
+    </div>
+    <div id="container">
+        <div class="sidebar">
+             <button class="ribbon-btn" id="add-doc-btn" style="width: 100%;">+ New Document</button>
+             <ul id="doc-list-sidebar" class="item-list"></ul>
+        </div>
+        <div class="main-content">
+             <div id="document-editor" contenteditable="true"></div>
+             <div id="doc-template-view">
+                <h2>Choose a Template</h2>
+                <div id="doc-template-grid">
+                    <div class="template-card" data-template="blank"><h3>Blank Document</h3></div>
+                    <div class="template-card" data-template="meeting"><h3>Meeting Notes</h3></div>
+                    <div class="template-card" data-template="proposal"><h3>Project Proposal</h3></div>
+                    <div class="template-card" data-template="story"><h3>Creative Story</h3></div>
+                </div>
+             </div>
+        </div>
+    </div>
+</div>
+<div id="project-view" class="app-view">
+    <div id="top-bar"> <button class="top-bar-btn" id="home-btn-from-projects">⬅️ Home</button> </div>
+    <div style="text-align:center; flex-grow: 1; overflow-y: auto;">
+        <h1 style="margin-top: 40px;">My Spaces</h1>
+        <div id="project-grid"></div>
+    </div>
+</div>
+<div id="spaces-app-view" class="app-view">
+    <div id="top-bar">
+        <button class="top-bar-btn" id="home-btn-from-space">⬅️ Home</button>
+        <button class="top-bar-btn" id="project-selector-btn">🚀 Back to Spaces</button>
+        <span id="project-title" style="font-size: 16px; font-weight: 600;"></span>
+        <div style="flex-grow: 1;"></div>
+    </div>
+    <div id="container">
+        <div class="sidebar">
+            <button class="ribbon-btn" id="add-page-btn" style="width: 100%;">+ Add Page</button>
+            <ul id="page-list" class="item-list"></ul>
+        </div>
+        <div id="main-content-spaces" class="main-content">
+            <textarea id="main_note-view" class="page-view" spellcheck="false"></textarea>
+            <textarea id="quick_note-view" class="page-view" spellcheck="false"></textarea>
+            <div id="todo-view" class="page-view"> <ul id="todo-list"></ul> <input type="text" id="todo-input" placeholder="Add to-do..."> </div>
+            <div id="sticky_note-view" class="page-view"> <button id="add-sticky-note-btn" class="ribbon-btn" style="position: absolute; top: 10px; right: 10px; z-index: 10;">+ Add Sticky Note</button> </div>
+            <div id="character-view" class="page-view"><div class="sidebar"></div><div class="main-content"></div></div>
+            <div id="timeline-view" class="page-view"></div>
+            <div id="challenges-view" class="page-view">
+                <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>🏆 Challenges</h2> <button id="add-challenge-btn" class="ribbon-btn">+ Add Challenge</button>
+                </div>
+                <div id="challenges-grid"></div>
+            </div>
+            <div id="dashboard-view" class="page-view" style="padding: 24px;"></div>
+        </div>
+    </div>
+</div>
+<div id="notes-app-view" class="app-view">
+     <div id="top-bar"> <button class="top-bar-btn" id="home-btn-from-notes">⬅️ Home</button> <h2 style="margin: 0;">Simple Notes</h2> </div>
+    <div id="container">
+        <div class="sidebar" style="width: 300px;">
+             <button class="ribbon-btn" id="add-note-sidebar-btn" style="width: 100%;">+ New Note</button>
+             <ul id="note-list-sidebar" class="item-list"></ul>
+        </div>
+        <div class="main-content"> <textarea id="notes-app-editor" spellcheck="false"></textarea> </div>
+    </div>
+</div>
+<div id="settings-view" class="app-view">
+    <div id="top-bar"> <button class="top-bar-btn" id="home-btn-from-settings">⬅️ Home</button> <h2 style="margin: 0;">Settings</h2> </div>
+    <div id="settings-view-content">
+        <div class="setting-group">
+            <label for="settings-theme-select">Theme</label>
+            <select id="settings-theme-select" class="ribbon-btn">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+                <option value="ocean">Ocean Blue</option>
+                <option value="darkblue">Dark Blue</option>
+                <option value="neon">Neon Green</option>
+                <option value="flashy">Flashy Red</option>
+                <option value="solar">Solar Flare</option>
+                <option value="crimsonred">Crimson Red</option>
+                <option value="crimsonblue">Crimson Blue</option>
+                <option value="crimsonyellow">Crimson Yellow</option>
+                <option value="custom">Custom</option>
+            </select>
+        </div>
+        <div class="setting-group">
+            <label>Default Document Font</label>
+            <select id="settings-font-select" class="ribbon-btn"></select>
+            <input type="number" id="settings-font-size" class="ribbon-btn" value="16" style="width: 70px;">
+        </div>
+        <div class="setting-group">
+            <label>Custom Theme</label>
+            <div id="custom-theme-grid">
+                <label for="custom-bg">Background</label><input type="color" id="custom-bg" data-var="--bg">
+                <label for="custom-fg">Text</label><input type="color" id="custom-fg" data-var="--fg">
+                <label for="custom-sidebar">Sidebar</label><input type="color" id="custom-sidebar" data-var="--sidebar">
+                <label for="custom-selected">Accent</label><input type="color" id="custom-selected" data-var="--selected">
+            </div>
+            <button id="apply-custom-theme" class="ribbon-btn" style="margin-top: 10px;">Apply Custom Theme</button>
+        </div>
+        <div class="setting-group">
+            <label>Recently Deleted</label>
+            <div id="trash-list"></div>
+        </div>
+    </div>
+</div>
+<div id="community-view" class="app-view">
+     <div id="top-bar"> <button class="top-bar-btn" id="home-btn-from-community">⬅️ Home</button> <h2 style="margin: 0;">Community & Help</h2> </div>
+     <div id="community-view-content">
+        <div class="link-card">
+            <h3>Main Website</h3>
+            <p>Visit our official website for the latest news and updates.</p>
+            <button class="ribbon-btn" data-link="https://hsworldtravel.wixstudio.com/cognito-write">Go to Website</button>
+        </div>
+        <div class="link-card">
+            <h3>Our Blog</h3>
+            <p>Read articles, tips, and behind-the-scenes stories from the team.</p>
+            <button class="ribbon-btn" data-link="https://hsworldtravel.wixstudio.com/cognito-write/blog">Visit Blog</button>
+        </div>
+        <div class="link-card">
+            <h3>Help Center</h3>
+            <p>Find answers to your questions and learn how to get the most out of Cognito Write.</p>
+            <button class="ribbon-btn" data-link="https://hsworldtravel.wixstudio.com/cognito-write/on-device-install/help">Get Help</button>
+        </div>
+        <div class="link-card">
+            <h3>Privacy Policy</h3>
+            <p>Read about how we handle your data and respect your privacy.</p>
+            <button class="ribbon-btn" data-link="https://hsworldtravel.wixstudio.com/cognito-write/on-device-install/privacy">View Policy</button>
+        </div>
+     </div>
+</div>
+<div id="input-modal" class="modal">
+    <div class="modal-content">
+        <h2 id="input-modal-title"></h2>
+        <input type="text" id="input-modal-field" placeholder="Enter title..." style="width: 100%; padding: 8px; font-size: 16px;">
+        <div style="margin-top: 20px;">
+            <button id="input-modal-confirm" class="ribbon-btn">Confirm</button>
+            <button id="input-modal-cancel" class="ribbon-btn">Cancel</button>
+        </div>
+    </div>
+</div>
+<div id="add-page-modal" class="modal">
+    <div class="modal-content">
+        <div id="page-type-selection" class="modal-view active">
+            <h2>Add a New Page</h2>
+            <div class="page-creation-grid">
+                <button data-type="main_note"><span>📝</span>Main Note</button>
+                <button data-type="character"><span>👤</span>Characters</button>
+                <button data-type="timeline"><span>📈</span>Timeline</button>
+                <button data-type="todo"><span>☑️</span>To-Do List</button>
+                <button data-type="sticky_note"><span>📌</span>Sticky Notes</button>
+                <button data-type="dashboard"><span>📊</span>Dashboard</button>
+            </div>
+        </div>
+        <div id="page-title-entry" class="modal-view">
+            <h2 id="page-title-heading"></h2>
+            <input type="text" id="page-title-input" placeholder="Enter page title..." style="padding: 8px; font-size: 16px; width: 100%;">
+            <div> <button id="create-page-confirm" class="ribbon-btn">Create</button> <button id="create-page-back" class="ribbon-btn">Back</button> </div>
+        </div>
+        <button id="add-page-cancel" class="ribbon-btn" style="margin-top: 20px;">Cancel</button>
+    </div>
+</div>
+<div id="add-challenge-modal" class="modal">
+    <div class="modal-content">
+        <div id="challenge-type-selection" class="modal-view active">
+            <h2>New Challenge</h2>
+            <div class="page-creation-grid">
+                <button data-type="word"><span>✍️</span>Word Count</button>
+                <button data-type="custom"><span>🎯</span>Custom</button>
+            </div>
+        </div>
+        <div id="challenge-entry" class="modal-view">
+            <h2 id="challenge-title-heading"></h2>
+            <div id="word-challenge-fields" style="display: none;">
+                <label>Link to Main Note:</label>
+                <select id="challenge-note-select" style="width: 100%; padding: 8px;"></select>
+                <label>Word Count Goal:</label>
+                <input type="number" id="challenge-word-count" placeholder="e.g., 5000" style="width: 100%; padding: 8px;">
+            </div>
+            <div id="custom-challenge-fields" style="display: none;">
+                <label>Challenge Description:</label>
+                <input type="text" id="challenge-custom-text" placeholder="e.g., Finish Chapter 3 outline" style="width: 100%; padding: 8px;">
+            </div>
+            <div>
+                 <button id="create-challenge-confirm" class="ribbon-btn">Add Challenge</button>
+                 <button id="create-challenge-back" class="ribbon-btn">Back</button>
+            </div>
+        </div>
+        <button id="add-challenge-cancel" class="ribbon-btn" style="margin-top: 20px;">Cancel</button>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const allowedOsThemes = new Set(['light', 'dark']);
+    const normalizeOsTheme = (theme) => allowedOsThemes.has(theme) ? theme : null;
+    let osThemeOverride = normalizeOsTheme(new URLSearchParams(window.location.search).get('osTheme'));
+
+    let appData = {};
+    let currentView = 'home';
+    let currentNoteId = null, currentDocId = null, currentProjectKey = null, currentPageId = null;
+    let docHistory = [];
+    let historyIndex = -1;
+    let historyTimeout;
+    
+    const views = {
+        home: document.getElementById('main-homepage'),
+        notes: document.getElementById('notes-app-view'),
+        docs: document.getElementById('docs-app-view'),
+        settings: document.getElementById('settings-view')
+    };
+
+    const docTemplates = {
+        blank: '',
+        meeting: '<h1>Meeting Notes</h1><h2>Date:</h2><p></p><h2>Attendees:</h2><ul><li></li></ul><h2>Agenda:</h2><ol><li></li></ol><h2>Action Items:</h2><ul><li></li></ul>',
+        proposal: '<h1>Project Proposal</h1><h2>Project Overview</h2><p></p><h2>Goals</h2><ul><li></li></ul><h2>Timeline</h2><p></p><h2>Budget</h2><p></p>',
+        story: '<h1>Chapter 1</h1><p>It was a dark and stormy night...</p>'
+    };
+
+    function saveData() { localStorage.setItem('cognito_app_data_v7', JSON.stringify(appData)); }
+    function saveAllData() {
+        if(currentView === 'notes') saveCurrentNote();
+        else if (currentView === 'docs') saveCurrentDoc();
+        saveData();
+    }
+    
+    function init() {
+        try {
+            const storedData = localStorage.getItem('cognito_app_data_v7');
+            appData = storedData ? JSON.parse(storedData) : createDefaultData();
+        } catch (e) {
+            console.error("Failed to parse data, resetting.", e);
+            appData = createDefaultData();
+        }
+        
+        initAllModes();
+        
+        // BUG FIX A: Always show Home view on startup instead of the last page
+        showView('home');
+        
+        document.getElementById('select-notes-mode').onclick = () => showView('notes');
+        document.getElementById('select-docs-mode').onclick = () => showView('docs');
+        document.getElementById('settings-btn-home').onclick = () => showView('settings');
+        
+        document.querySelectorAll('.top-bar-btn[id^="home-btn-"]').forEach(btn => {
+            if(btn) btn.onclick = () => showView('home');
+        });
+
+        window.addEventListener('message', (event) => {
+            if (event.origin !== window.location.origin) return;
+            if (!event.data) return;
+
+            if (event.data.type === 'temp_os_theme') {
+                const nextTheme = normalizeOsTheme(event.data.theme);
+                if (!nextTheme) return;
+
+                osThemeOverride = nextTheme;
+                applyTheme(nextTheme);
+                const themeSelect = document.getElementById('settings-theme-select');
+                if (themeSelect) {
+                    themeSelect.value = nextTheme;
+                    themeSelect.disabled = true;
+                    themeSelect.title = 'Theme is synced from tempOS appearance settings.';
+                }
+
+                return;
+            }
+
+            if (event.data.type === 'temp_os_open_note') {
+                showView('notes');
+                refreshNotesList();
+                if (event.data.noteId && appData.notes[event.data.noteId]) {
+                    loadNote(event.data.noteId);
+                }
+                return;
+            }
+
+            if (event.data.type === 'temp_os_open_doc') {
+                showView('docs');
+                refreshDocsList();
+                if (event.data.docId && appData.documents[event.data.docId]) {
+                    loadDoc(event.data.docId);
+                }
+            }
+        });
+        
+        if (osThemeOverride) {
+            applyTheme(osThemeOverride);
+        } else {
+            applyTheme(appData.settings.theme, appData.settings.theme === 'custom');
+        }
+    }
+
+    function initAllModes() {
+        initNotesApp();
+        initDocsApp();
+        initSettingsApp();
+        initGlobalShortcuts();
+    }
+    
+    function createDefaultData() { 
+        return { 
+            notes: {}, 
+            projects: {}, 
+            documents: {}, 
+            trash: {},
+            settings: { theme:"light", docFont:"Arial", docFontSize: 16, customTheme: {}, accentColor: "#0078d4" } 
+        }; 
+    }
+    
+    function showView(viewName) {
+        saveAllData();
+        currentView = viewName;
+        Object.values(views).forEach(v => { if(v) v.style.display = 'none'; });
+        if(views[viewName]) views[viewName].style.display = 'flex';
+        
+        if (viewName === 'notes') refreshNotesList();
+        else if (viewName === 'docs') refreshDocsList();
+        else if (viewName === 'settings') renderTrashList();
+
+        if (viewName !== 'home') { localStorage.setItem('last_view_v7', viewName); } 
+        else { localStorage.removeItem('last_view_v7'); }
+    }
+    
+    function applyTheme(theme, isCustom = false) {
+        if (isCustom) {
+            document.documentElement.dataset.theme = 'custom';
+            const customTheme = appData.settings.customTheme;
+            for (const [key, value] of Object.entries(customTheme)) {
+                document.documentElement.style.setProperty(key, value);
+            }
+            appData.settings.theme = 'custom';
+        } else {
+            document.documentElement.removeAttribute('style');
+            document.documentElement.dataset.theme = theme;
+            appData.settings.theme = theme;
+        }
+        document.querySelectorAll('select[id*="theme-select"]').forEach(s => { if(s) s.value = theme;});
+        applyAccentColor(appData.settings.accentColor);
+        saveData();
+    }
+
+    function applyAccentColor(color) {
+        if (!color) return;
+        document.documentElement.style.setProperty('--selected', color);
+        document.documentElement.style.setProperty('--glow', color);
+        appData.settings.accentColor = color;
+        saveData();
+    }
+
+    function showInputModal(title, callback) {
+        const modal = document.getElementById('input-modal');
+        const titleEl = document.getElementById('input-modal-title');
+        const inputEl = document.getElementById('input-modal-field');
+        const confirmBtn = document.getElementById('input-modal-confirm');
+        const cancelBtn = document.getElementById('input-modal-cancel');
+
+        titleEl.textContent = title;
+        inputEl.value = '';
+        modal.style.display = 'flex';
+        inputEl.focus();
+
+        const confirmHandler = () => {
+            const value = inputEl.value.trim();
+            if (value) {
+                callback(value);
+                closeModal();
+            }
+        };
+        const cancelHandler = () => closeModal();
+        const keydownHandler = (e) => {
+            if (e.key === 'Enter') confirmHandler();
+            if (e.key === 'Escape') cancelHandler();
+        }
+
+        const closeModal = () => {
+            modal.style.display = 'none';
+            confirmBtn.removeEventListener('click', confirmHandler);
+            cancelBtn.removeEventListener('click', cancelHandler);
+            inputEl.removeEventListener('keydown', keydownHandler);
+        };
+        
+        confirmBtn.addEventListener('click', confirmHandler);
+        cancelBtn.addEventListener('click', cancelHandler);
+        inputEl.addEventListener('keydown', keydownHandler);
+    }
+
+    function initGlobalShortcuts() {
+        document.addEventListener('keydown', e => {
+            const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+            const metaKey = isMac ? e.metaKey : e.ctrlKey;
+
+            if (metaKey && e.key === 's') { e.preventDefault(); saveAllData(); }
+            if (metaKey && e.key === 'n') {
+                 e.preventDefault();
+                 if(currentView === 'notes') addNewNote();
+                 else if(currentView === 'docs') addNewDoc(null);
+            }
+            if(currentView === 'docs') {
+                 if(metaKey && e.key === 'b') { e.preventDefault(); document.execCommand('bold'); }
+                 if(metaKey && e.key === 'i') { e.preventDefault(); document.execCommand('italic'); }
+                 if(metaKey && e.key === 'u') { e.preventDefault(); document.execCommand('underline'); }
+                 if(metaKey && (e.key === 'z' || e.key === 'Z')) {
+                     e.preventDefault();
+                     if (e.shiftKey) redoDoc(); else undoDoc();
+                 }
+                 if(metaKey && e.key === 'y') { e.preventDefault(); redoDoc(); }
+            }
+        });
+    }
+
+    // --- NOTES APP ---
+    function initNotesApp() {
+        document.getElementById('add-note-sidebar-btn').onclick = addNewNote;
+        document.getElementById('notes-app-editor').addEventListener('input', saveCurrentNote);
+    }
+    function refreshNotesList() {
+        const noteListSidebar = document.getElementById('note-list-sidebar');
+        const notesEditor = document.getElementById('notes-app-editor');
+        noteListSidebar.innerHTML = '';
+        const sortedKeys = Object.keys(appData.notes).sort().reverse();
+        if (sortedKeys.length === 0 && currentView === 'notes') {
+            notesEditor.value = "Create a new note to get started!";
+            currentNoteId = null;
+        }
+        sortedKeys.forEach(noteId => {
+            const li = document.createElement('li');
+            li.className = 'list-item note-item';
+            li.dataset.noteId = noteId;
+            li.textContent = appData.notes[noteId].title;
+            if (noteId === currentNoteId) li.classList.add('active');
+            li.onclick = () => loadNote(noteId);
+            noteListSidebar.appendChild(li);
+        });
+    }
+    function addNewNote() {
+        showInputModal('Enter a title for your new note:', (title) => {
+            const newId = 'note-' + Date.now();
+            appData.notes[newId] = {id: newId, title: title, content: '' };
+            saveData();
+            refreshNotesList();
+            loadNote(newId);
+        });
+    }
+    function saveCurrentNote() {
+        if (currentNoteId && appData.notes[currentNoteId]) {
+            appData.notes[currentNoteId].content = document.getElementById('notes-app-editor').value;
+        }
+    }
+    function loadNote(noteId) {
+        saveCurrentNote();
+        currentNoteId = noteId;
+        if (appData.notes[noteId]) {
+            document.getElementById('notes-app-editor').value = appData.notes[noteId].content;
+            document.querySelectorAll('.note-item').forEach(n => n.classList.remove('active'));
+            const activeItem = document.querySelector(`.note-item[data-note-id="${noteId}"]`);
+            if(activeItem) activeItem.classList.add('active');
+        }
+    }
+    
+    // --- DOCUMENTS APP ---
+    function initDocsApp() {
+        const docEditor = document.getElementById('document-editor');
+        const docFontSelect = document.getElementById('doc-font-select');
+        const docFontSize = document.getElementById('doc-font-size');
+        
+        const fonts = ['Arial', 'Verdana', 'Times New Roman', 'Courier New', 'Georgia', 'Comic Sans MS'];
+        const settingsFontSelect = document.getElementById('settings-font-select');
+        docFontSelect.innerHTML = '';
+        if(settingsFontSelect) settingsFontSelect.innerHTML = '';
+        fonts.forEach(f => {
+            docFontSelect.innerHTML += `<option value="${f}">${f}</option>`;
+            if(settingsFontSelect) settingsFontSelect.innerHTML += `<option value="${f}">${f}</option>`;
+        });
+
+        document.getElementById('add-doc-btn').onclick = () => addNewDoc(null);
+        docEditor.addEventListener('input', saveCurrentDoc);
+        docFontSelect.onchange = () => applyDocStyle(true);
+        docFontSize.onchange = () => applyDocStyle(true);
+        
+        document.getElementById('doc-change-icon-btn').onclick = changeDocIcon;
+        document.getElementById('doc-delete-btn').onclick = deleteCurrentDoc;
+        document.getElementById('doc-export-btn').onclick = () => exportDoc('docx');
+        document.getElementById('doc-insert-image-btn').onclick = insertImage;
+        
+        document.querySelectorAll('#doc-ribbon-tabs .ribbon-btn').forEach(tab => {
+            tab.onclick = () => {
+                document.querySelectorAll('#doc-ribbon-tabs .ribbon-btn').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.doc-ribbon-panel').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                document.querySelector(`.doc-ribbon-panel[data-tab-panel="${tab.dataset.tab}"]`).classList.add('active');
+            };
+        });
+        
+        document.querySelectorAll('#doc-template-grid .template-card').forEach(card => {
+            card.onclick = () => addNewDoc(card.dataset.template);
+        });
+        
+        document.getElementById('doc-undo-btn').onclick = undoDoc;
+        document.getElementById('doc-redo-btn').onclick = redoDoc;
+        docEditor.addEventListener('input', () => {
+            clearTimeout(historyTimeout);
+            historyTimeout = setTimeout(addDocHistory, 500);
+        });
+    }
+    function applyDocStyle(saveAsPreference = false) {
+        const docEditor = document.getElementById('document-editor');
+        const docFontSelect = document.getElementById('doc-font-select');
+        const docFontSize = document.getElementById('doc-font-size');
+        const font = saveAsPreference ? docFontSelect.value : (appData.settings.docFont || 'Arial');
+        const size = saveAsPreference ? docFontSize.value : (appData.settings.docFontSize || 16);
+        
+        docEditor.style.fontFamily = font;
+        docEditor.style.fontSize = size + 'px';
+        
+        docFontSelect.value = font;
+        docFontSize.value = size;
+
+        if(saveAsPreference) {
+            appData.settings.docFont = font;
+            appData.settings.docFontSize = size;
+            saveData();
+            document.getElementById('settings-font-select').value = font;
+            document.getElementById('settings-font-size').value = size;
+        }
+    }
+    function refreshDocsList() {
+        const docListSidebar = document.getElementById('doc-list-sidebar');
+        const docEditor = document.getElementById('document-editor');
+        const templateView = document.getElementById('doc-template-view');
+        if(!docListSidebar) return;
+        
+        docListSidebar.innerHTML = '';
+        const sortedKeys = Object.keys(appData.documents).sort().reverse();
+
+        if (sortedKeys.length === 0 && currentView === 'docs') {
+            docEditor.style.display = 'none';
+            templateView.style.display = 'flex';
+        } else {
+            docEditor.style.display = 'block';
+            templateView.style.display = 'none';
+        }
+
+        sortedKeys.forEach(docId => {
+            const li = document.createElement('li');
+            li.className = 'list-item doc-item';
+            li.dataset.docId = docId;
+            li.innerHTML = `<span>${appData.documents[docId].icon || '📄'}</span> ${appData.documents[docId].title}`;
+            if (docId === currentDocId) li.classList.add('active');
+            li.onclick = () => loadDoc(docId);
+            docListSidebar.appendChild(li);
+        });
+    }
+    function addNewDoc(templateKey) {
+        const callback = (title) => {
+            const newId = 'doc-' + Date.now();
+            const content = templateKey ? docTemplates[templateKey] : '';
+            appData.documents[newId] = {id: newId, title: title, content: content, icon: '📄' };
+            saveData();
+            refreshDocsList();
+            loadDoc(newId);
+        };
+
+        if (templateKey) {
+            const title = `${templateKey.charAt(0).toUpperCase() + templateKey.slice(1)} Document`;
+            callback(title);
+        } else {
+            showInputModal('Enter a title for your new document:', callback);
+        }
+    }
+    function saveCurrentDoc() {
+         if (currentDocId && appData.documents[currentDocId]) {
+            appData.documents[currentDocId].content = document.getElementById('document-editor').innerHTML;
+        }
+    }
+    function loadDoc(docId) {
+        saveCurrentDoc();
+        currentDocId = docId;
+        if (appData.documents[docId]) {
+            const editor = document.getElementById('document-editor');
+            editor.innerHTML = appData.documents[docId].content;
+            applyDocStyle();
+            refreshDocsList();
+
+            docHistory = [editor.innerHTML];
+            historyIndex = 0;
+            updateUndoRedoButtons();
+        }
+    }
+    function addDocHistory() {
+        if (!currentDocId) return;
+        const content = document.getElementById('document-editor').innerHTML;
+        const lastState = docHistory[historyIndex];
+        if (content === lastState) return;
+
+        docHistory.splice(historyIndex + 1);
+        docHistory.push(content);
+        historyIndex = docHistory.length - 1;
+        updateUndoRedoButtons();
+    }
+    function undoDoc() {
+        if (historyIndex > 0) {
+            historyIndex--;
+            document.getElementById('document-editor').innerHTML = docHistory[historyIndex];
+            updateUndoRedoButtons();
+        }
+    }
+    function redoDoc() {
+        if (historyIndex < docHistory.length - 1) {
+            historyIndex++;
+            document.getElementById('document-editor').innerHTML = docHistory[historyIndex];
+            updateUndoRedoButtons();
+        }
+    }
+    function updateUndoRedoButtons() {
+        document.getElementById('doc-undo-btn').disabled = historyIndex <= 0;
+        document.getElementById('doc-redo-btn').disabled = historyIndex >= docHistory.length - 1;
+    }
+    function changeDocIcon() {
+        if (!currentDocId) return;
+        showInputModal("Enter new emoji icon:", (newIcon) => {
+             appData.documents[currentDocId].icon = newIcon;
+             saveData();
+             refreshDocsList();
+        });
+    }
+    function deleteCurrentDoc() {
+        if (!currentDocId || !appData.documents[currentDocId]) return;
+        showInputModal(`Type "${appData.documents[currentDocId].title}" to confirm deletion`, (confirmText) => {
+            if(confirmText === appData.documents[currentDocId].title) {
+                moveToTrash('document', currentDocId);
+            } else {
+                alert("Confirmation text did not match.");
+            }
+        });
+    }
+    function exportDoc(format) {
+        const content = document.getElementById('document-editor').innerHTML;
+        const title = appData.documents[currentDocId]?.title || 'document';
+        if (format === 'docx') {
+            const contentBlob = htmlDocx.asBlob(content);
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(contentBlob);
+            link.download = `${title}.docx`;
+            link.click();
+        }
+    }
+    function insertImage() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = e => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = readerEvent => {
+                const img = document.createElement('img');
+                img.src = readerEvent.target.result;
+                img.style.maxWidth = '100%';
+                document.getElementById('document-editor').focus();
+                document.execCommand('insertHTML', false, img.outerHTML);
+            }
+            reader.readAsDataURL(file);
+        }
+        input.click();
+    }
+    
+    // --- SPACES APP ---
+    function initSpacesApp() {
+        document.getElementById('project-selector-btn').onclick = () => showView('home'); // BUG FIX A: Back to Home instead of grid
+        document.getElementById('home-btn-from-space').onclick = () => showView('home');
+        document.getElementById('add-sticky-note-btn').onclick = () => {
+             const page = findPageById(currentPageId);
+             if (page && page.type === 'sticky_note') {
+                if(!page.content.notes) page.content.notes = [];
+                const newNoteData = { id: 'sticky-' + Date.now(), text: 'New Note', x: 20, y: 20 };
+                page.content.notes.push(newNoteData);
+                createStickyNoteElement(newNoteData);
+                saveAllData(); // Corrected function call
+             }
+        };
+        setupAddPageModal();
+        setupChallengeModal();
+    }
+    function renderProjectGrid() {
+        const projectGrid = document.getElementById('project-grid');
+        projectGrid.innerHTML = '';
+        Object.keys(appData.projects).forEach(key => {
+            const card = document.createElement('div');
+            card.className = 'project-card';
+            card.innerHTML = `<h3>${key}</h3>`;
+            card.onclick = () => { currentProjectKey = key; showView('space_project'); loadProjectData(); };
+            projectGrid.appendChild(card);
+        });
+        const newCard = document.createElement('div');
+        newCard.className = 'project-card project-card-new';
+        newCard.innerHTML = '<h3>+ Create New Space</h3>';
+        newCard.onclick = createNewProject;
+        projectGrid.appendChild(newCard);
+    }
+    function createNewProject() {
+        showInputModal('Enter a title for your new Space:', (title) => {
+            if(appData.projects[title]) return alert('A Space with this name already exists.');
+            const defaultPages = [
+                { id: 'page-1', type: 'dashboard', title: 'Dashboard' },
+                { id: 'page-2', type: 'main_note', title: 'My First Note', content: 'Welcome!' }
+            ];
+            appData.projects[title] = { pages: defaultPages, activePageId: 'page-1', challenges: [] };
+            saveAllData();
+            currentProjectKey = title;
+            showView('space_project');
+            loadProjectData();
+        });
+    }
+    function loadProjectData() { 
+        if (!currentProjectKey) return;
+        localStorage.setItem('last_view_v7', 'space_project');
+        const project = appData.projects[currentProjectKey];
+        currentPageId = project.activePageId;
+        document.getElementById('project-title').textContent = currentProjectKey;
+        refreshPageList();
+        loadPage(currentPageId);
+    }
+    function saveCurrentPageData() {
+        if(!currentPageId || currentPageId === 'dashboard') return;
+        const page = findPageById(currentPageId);
+        if(!page) return;
+        const view = document.getElementById(`${page.type}-view`);
+        if((page.type === 'main_note' || page.type === 'quick_note') && view) {
+            page.content = view.value;
+        }
+    }
+    function findPageById(pageId) {
+        if (!currentProjectKey || !appData.projects[currentProjectKey] || !appData.projects[currentProjectKey].pages) return null;
+        return appData.projects[currentProjectKey].pages.find(p => p.id === pageId);
+    }
+    function refreshPageList() {
+        const pageList = document.getElementById('page-list');
+        pageList.innerHTML = '';
+        const project = appData.projects[currentProjectKey];
+        if (!project) return;
+        const sortedPages = [...project.pages].sort((a, b) => {
+             if (a.type === 'dashboard') return -1;
+             if (b.type === 'dashboard') return 1;
+             if (a.type.startsWith('main')) return -1;
+             if (b.type.startsWith('main')) return 1;
+             return 0;
+        });
+        sortedPages.forEach(page => {
+            const li = document.createElement('li');
+            li.className = 'list-item page-item';
+            li.dataset.pageId = page.id;
+            if (page.id === currentPageId) li.classList.add('active');
+            const icons = { main_note: '📝', todo: '☑️', quick_note: '🗒️', sticky_note: '📌', challenges: '🏆', dashboard: '📊', character: '👤', timeline: '📈' };
+            li.innerHTML = `<span>${icons[page.type] || '📄'}</span> ${page.title}`;
+            li.onclick = () => loadPage(page.id);
+            pageList.appendChild(li);
+        });
+    }
+    function loadPage(pageId) {
+        saveCurrentPageData();
+        document.querySelectorAll('#spaces-app-view .page-view').forEach(v => v.style.display = 'none');
+        document.querySelectorAll('#spaces-app-view .list-item').forEach(i => i.classList.remove('active'));
+        
+        const page = findPageById(pageId);
+        if (!page) {
+            const firstPage = appData.projects[currentProjectKey]?.pages[0];
+            if(firstPage) loadPage(firstPage.id);
+            return;
+        }
+
+        currentPageId = page.id;
+        appData.projects[currentProjectKey].activePageId = page.id;
+        const view = document.getElementById(`${page.type}-view`);
+        const listItem = document.querySelector(`.page-item[data-page-id="${page.id}"]`);
+        
+        if (view) {
+            view.style.display = 'flex';
+            if (page.type === 'main_note' || page.type === 'quick_note') view.value = page.content || '';
+            else if (page.type === 'todo') renderTodoPage(page);
+            else if (page.type === 'character') renderCharacterPage(page);
+            else if (page.type === 'timeline') renderTimelinePage(page);
+            else if (page.type === 'challenges') renderChallengesPage();
+            else if (page.type === 'sticky_note') renderStickyNotePage(page);
+            else if (page.type === 'dashboard') renderDashboard();
+        }
+        if(listItem) listItem.classList.add('active');
+        saveAllData();
+    }
+    
+    function setupAddPageModal() {
+        const modal = document.getElementById('add-page-modal');
+        const typeSelection = modal.querySelector('#page-type-selection');
+        const titleEntry = modal.querySelector('#page-title-entry');
+        let pageTypeToCreate = null;
+
+        document.getElementById('add-page-btn').onclick = () => {
+            typeSelection.style.display = 'block';
+            titleEntry.style.display = 'none';
+            modal.style.display = 'flex';
+        };
+        modal.querySelectorAll('.page-creation-grid button').forEach(button => {
+            button.onclick = () => {
+                pageTypeToCreate = button.dataset.type;
+                if (pageTypeToCreate === 'dashboard' && appData.projects[currentProjectKey].pages.some(p => p.type === 'dashboard')) {
+                    return alert('A project can only have one dashboard.');
+                }
+                titleEntry.querySelector('h2').textContent = `Create ${pageTypeToCreate.replace('_', ' ')}`;
+                typeSelection.style.display = 'none';
+                titleEntry.style.display = 'grid';
+                titleEntry.querySelector('input').focus();
+            };
+        });
+        modal.querySelector('#create-page-confirm').onclick = () => {
+            const titleInput = titleEntry.querySelector('input');
+            const title = titleInput.value.trim();
+            if (title && pageTypeToCreate) {
+                const newPage = { id: 'page-' + Date.now(), type: pageTypeToCreate, title: title, content: {} };
+                if (pageTypeToCreate === 'character') newPage.content = { characters: [] };
+                else if (pageTypeToCreate === 'timeline') newPage.content = { events: [] };
+                else if (pageTypeToCreate === 'todo') newPage.content = { items: [] };
+                else if (pageTypeToCreate === 'sticky_note') newPage.content = { notes: [] };
+                else newPage.content = '';
+                
+                appData.projects[currentProjectKey].pages.push(newPage);
+                titleInput.value = '';
+                modal.style.display = 'none';
+                refreshPageList();
+                loadPage(newPage.id);
+            }
+        };
+        modal.querySelector('#create-page-back').onclick = () => {
+            titleEntry.style.display = 'none';
+            typeSelection.style.display = 'block';
+        };
+        modal.querySelector('#add-page-cancel').onclick = () => { modal.style.display = 'none'; };
+    }
+    function renderDashboard() { /* Implement dashboard cards */ }
+    function renderTodoPage(page) { /* Implement todo list logic */ }
+    
+    // BUG FIX B: Implement Sticky Note functions
+    function renderStickyNotePage(page) {
+        const view = document.getElementById('sticky_note-view');
+        const btn = document.getElementById('add-sticky-note-btn');
+        view.innerHTML = ''; 
+        view.appendChild(btn);
+        if (page.content && page.content.notes) {
+            page.content.notes.forEach(n => createStickyNoteElement(n));
+        }
+    }
+
+    function createStickyNoteElement(noteData) {
+        const view = document.getElementById('sticky_note-view');
+        const div = document.createElement('div');
+        div.className = 'sticky-note';
+        div.style.left = (noteData.x || 20) + 'px';
+        div.style.top = (noteData.y || 20) + 'px';
+        
+        const ta = document.createElement('textarea');
+        ta.value = noteData.text || '';
+        ta.placeholder = "Write something...";
+        ta.oninput = () => { noteData.text = ta.value; saveAllData(); };
+        
+        div.appendChild(ta);
+        view.appendChild(div);
+
+        // Movement logic
+        div.onmousedown = (e) => {
+            if(e.target === ta) return; // Don't drag when typing
+            let offsetX = e.clientX - div.offsetLeft;
+            let offsetY = e.clientY - div.offsetTop;
+            
+            document.onmousemove = (me) => {
+                noteData.x = me.clientX - offsetX;
+                noteData.y = me.clientY - offsetY;
+                div.style.left = noteData.x + 'px';
+                div.style.top = noteData.y + 'px';
+            };
+            
+            document.onmouseup = () => { 
+                document.onmousemove = null; 
+                saveAllData(); 
+            };
+        };
+    }
+
+    function renderCharacterPage(page) { /* Implement character profiles */ }
+    function renderTimelinePage(page) { /* Implement timeline dragging */ }
+    function renderChallengesPage() { /* Implement word counts */ }
+    function setupChallengeModal() {
+        const modal = document.getElementById('add-challenge-modal');
+        const addChallengeBtn = document.getElementById('add-challenge-btn');
+        if (addChallengeBtn) {
+            addChallengeBtn.onclick = () => modal.style.display = 'flex';
+        }
+    }
+    function populateChallengeNoteSelect() { /* Link main notes to word counters */ }
+
+    // --- SETTINGS & TRASH ---
+    function initSettingsApp() {
+        const themeSelect = document.getElementById('settings-theme-select');
+        const fontSelect = document.getElementById('settings-font-select');
+        const fontSize = document.getElementById('settings-font-size');
+        const customThemeGrid = document.getElementById('custom-theme-grid');
+        const applyCustomThemeButton = document.getElementById('apply-custom-theme');
+        
+        themeSelect.value = appData.settings.theme;
+        fontSelect.value = appData.settings.docFont;
+        fontSize.value = appData.settings.docFontSize;
+        
+        if (osThemeOverride) {
+            themeSelect.value = osThemeOverride;
+            themeSelect.disabled = true;
+            themeSelect.title = 'Theme is synced from tempOS appearance settings.';
+            customThemeGrid.querySelectorAll('input[type="color"]').forEach(input => {
+                input.disabled = true;
+            });
+            applyCustomThemeButton.disabled = true;
+        }
+
+        themeSelect.onchange = () => {
+            if (osThemeOverride) return;
+            applyTheme(themeSelect.value);
+        };
+        fontSelect.onchange = () => { appData.settings.docFont = fontSelect.value; saveData(); applyDocStyle(); };
+        fontSize.onchange = () => { appData.settings.docFontSize = fontSize.value; saveData(); applyDocStyle(); };
+
+        applyCustomThemeButton.onclick = () => {
+            if (osThemeOverride) return;
+            const customTheme = {};
+            customThemeGrid.querySelectorAll('input[type="color"]').forEach(input => {
+                customTheme[input.dataset.var] = input.value;
+            });
+            appData.settings.customTheme = customTheme;
+            applyTheme('custom', true);
+        };
+        
+        Object.entries(appData.settings.customTheme || {}).forEach(([key, value]) => {
+            const input = customThemeGrid.querySelector(`[data-var="${key}"]`);
+            if (input) input.value = value;
+        });
+    }
+    function moveToTrash(type, id) {
+        const itemType = type === 'document' ? 'documents' : type + 's';
+        const item = appData[itemType][id];
+        if (!item) return;
+        if (!appData.trash) appData.trash = {};
+        const trashId = `${type}-${id}`;
+        appData.trash[trashId] = { ...item, type: type, originalId: id };
+        delete appData[itemType][id];
+        saveData();
+        if (currentView === 'settings') renderTrashList();
+        
+        if(type === 'document') {
+            currentDocId = null;
+            refreshDocsList();
+            const remainingDocs = Object.keys(appData.documents);
+            if (remainingDocs.length > 0) loadDoc(remainingDocs[0]);
+            else document.getElementById('document-editor').innerHTML = '';
+        }
+    }
+    function renderTrashList() {
+        const trashList = document.getElementById('trash-list');
+        if (!trashList) return;
+        trashList.innerHTML = '';
+        if (!appData.trash || Object.keys(appData.trash).length === 0) {
+            trashList.innerHTML = '<li>Trash is empty.</li>';
+            return;
+        }
+        Object.values(appData.trash).forEach(item => {
+            const li = document.createElement('div');
+            li.className = 'trash-item';
+            li.innerHTML = `<span>${item.icon || '🗑️'} ${item.title}</span>`;
+            const restoreBtn = document.createElement('button');
+            restoreBtn.textContent = 'Restore';
+            restoreBtn.className = 'ribbon-btn';
+            restoreBtn.onclick = () => restoreFromTrash(item.originalId, item.type);
+            li.appendChild(restoreBtn);
+            trashList.appendChild(li);
+        });
+    }
+    function restoreFromTrash(originalId, type) {
+        const trashId = `${type}-${originalId}`;
+        const item = appData.trash[trashId];
+        if (!item) return;
+        const itemType = item.type === 'document' ? 'documents' : item.type + 's';
+        delete item.type;
+        delete item.originalId;
+        appData[itemType][originalId] = item;
+        delete appData.trash[trashId];
+        saveData();
+        renderTrashList();
+    }
+    
+    init();
+});
+</script>
+</body>
+</html>

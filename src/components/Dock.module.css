@@ -5,18 +5,59 @@
   display: flex;
   justify-content: center;
   z-index: 9998;
+  transition: transform 0.22s ease, opacity 0.22s ease;
+}
+
+.autoHideEnabled.hidden {
+  transform: translateY(88px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.autoHideEnabled.visible {
+  transform: translateY(0);
+  opacity: 1;
 }
 
 .dock {
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  padding: 8px 12px;
-  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  padding: 10px 14px;
+  border-radius: 28px;
   display: flex;
   gap: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.light {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.dark {
+  background: rgba(18, 18, 20, 0.32);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.32);
+}
+
+.dark .icon {
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
+}
+
+.dark .activeDot {
+  background: #fff;
+}
+
+.dark .contextMenu {
+  background: rgba(18, 18, 20, 0.95);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark .contextMenu div {
+  color: #f5f5f7;
 }
 
 .dockItemWrapper {
@@ -29,19 +70,26 @@
 }
 
 .icon {
-  font-size: 42px;
-  transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
-  background: rgba(255, 255, 255, 0.9);
+  font-size: 28px;
+  width: 44px;
+  height: 44px;
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  background: rgba(255, 255, 255, 0.95);
   border-radius: 14px;
-  padding: 4px;
+  padding: 6px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.icon:hover {
-  transform: scale(1.25) translateY(-5px);
+.icon img {
+  width: 28px;
+  height: 28px;
+}
+
+.iconLoader {
+  position: absolute;
 }
 
 .activeDot {

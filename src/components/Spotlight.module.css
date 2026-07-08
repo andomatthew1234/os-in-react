@@ -1,0 +1,157 @@
+.overlay {
+  position: absolute;
+  inset: 28px 0 0;
+  z-index: 10001;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 44px;
+  background: rgba(13, 21, 34, 0.12);
+}
+
+.panel {
+  width: min(720px, calc(100vw - 32px));
+  border-radius: 24px;
+  overflow: hidden;
+  backdrop-filter: blur(28px) saturate(1.16);
+  -webkit-backdrop-filter: blur(28px) saturate(1.16);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+}
+
+.light {
+  background: rgba(247, 249, 252, 0.84);
+  border: 1px solid rgba(255, 255, 255, 0.52);
+}
+
+.dark {
+  background: rgba(18, 23, 34, 0.84);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.searchRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(127, 127, 127, 0.16);
+}
+
+.searchIcon {
+  width: 14px;
+  height: 14px;
+  border: 1.8px solid currentColor;
+  border-radius: 50%;
+  position: relative;
+  opacity: 0.6;
+}
+
+.searchIcon::after {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 1.8px;
+  border-radius: 999px;
+  background: currentColor;
+  right: -5px;
+  bottom: -1px;
+  transform: rotate(45deg);
+}
+
+.input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 1.05rem;
+}
+
+.results {
+  max-height: min(68vh, 540px);
+  overflow: auto;
+  padding: 10px;
+}
+
+.resultButton {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 16px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.resultButton:hover,
+.resultActive {
+  background: rgba(0, 122, 255, 0.14);
+}
+
+.dark .resultButton:hover,
+.dark .resultActive {
+  background: rgba(10, 132, 255, 0.2);
+}
+
+.resultIcon {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.42);
+  font-size: 0.86rem;
+  font-weight: 700;
+  overflow: hidden;
+}
+
+.resultIconImage {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.dark .resultIcon {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.resultMeta {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.resultMeta strong,
+.resultMeta span,
+.resultKind,
+.emptyState span,
+.emptyState strong {
+  display: block;
+}
+
+.resultMeta span,
+.resultKind,
+.emptyState span {
+  font-size: 0.86rem;
+  opacity: 0.72;
+}
+
+.resultKind {
+  padding-left: 10px;
+  white-space: nowrap;
+}
+
+.emptyState {
+  padding: 26px 20px 30px;
+  text-align: center;
+}
+
+.emptyState strong {
+  margin-bottom: 6px;
+}

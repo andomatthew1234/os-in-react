@@ -1,11 +1,17 @@
-# React + Vite
+# OS-in-react
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+OS-in-react it similar to the Windows in react project (they were a source of insp for this project): https://win11.blueedge.me/
 
-Currently, two official plugins are available:
+**A similar replica to macOS Sequia 15.1.1, built to run in a web browser in react.**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+🧩 Current base features
+- Window management system with drag, close, minimise, fullscreen functionality,
+- Working dock with Quit, multiple window, and show all window functionality
+- 5 apps (including Finder, Safari, Terminal, Calculator, Settings)
+- Menu bar
+🎨 Current personlisation features
+- Light/dark mode with custom icons
+- 8 backgrounds
 
 ## React Compiler
 
